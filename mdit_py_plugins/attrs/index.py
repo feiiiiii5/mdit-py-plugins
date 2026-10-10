@@ -59,7 +59,14 @@ def attrs_plugin(
     """
 
     if spans:
-        md.inline.ruler.after(span_after, "span", _span_rule)
+        md.inline.ruler.after(
+            span_after,
+            "span",
+            partial(
+                _span_rule,
+                allowed=None if allowed is None else set(allowed),
+            ),
+        )
     if after:
         md.inline.ruler.push(
             "attr",
@@ -115,7 +122,9 @@ def _find_opening(tokens: Sequence[Token], index: int) -> int | None:
     return None
 
 
-def _span_rule(state: StateInline, silent: bool) -> bool:
+def _span_rule(
+    state: StateInline, silent: bool, *, allowed: set[str] | None = None
+) -> bool:
     if state.src[state.pos] != "[":
         return False
 
@@ -144,7 +153,7 @@ def _span_rule(state: StateInline, silent: bool) -> bool:
         state.pos = labelStart
         state.posMax = labelEnd
         token = state.push("span_open", "span", 1)
-        token.attrs = attrs  # type: ignore[assignment]
+        _add_attrs(token, attrs, allowed)
         state.md.inline.tokenize(state)
         token = state.push("span_close", "span", -1)
 

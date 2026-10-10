@@ -1,5 +1,20 @@
 # Change Log
 
+## Unreleased
+
+- 🐛 FIX: apply the `allowed` filter to attributes on `[]` spans
+
+  `attrs_plugin` documents `allowed` as applying to the attributes it parses, but
+  the `spans=True` rule assigned `token.attrs` directly, so an attribute outside
+  the allow-list was rendered into the HTML instead of being moved to the token's
+  `meta["insecure_attrs"]`:
+
+  ```python
+  MarkdownIt().use(attrs_plugin, spans=True, allowed=["safe"]).render("[a]{danger=1 safe=2} b")
+  # before: '<p><span danger="1" safe="2">a</span> b</p>\n'
+  # after:  '<p><span safe="2">a</span> b</p>\n'
+  ```
+
 ## 0.7.0 - 2026-07-19
 
 - ✨ NEW: Add section reference plugin (`section_ref`) (#144)

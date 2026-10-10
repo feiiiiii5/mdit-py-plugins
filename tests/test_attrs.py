@@ -37,3 +37,16 @@ def test_attrs_allowed(data_regression):
 `inline`{safe=a danger=b}
     """)
     data_regression.check([t.as_dict() for t in tokens])
+
+
+def test_attrs_allowed_spans(data_regression):
+    allowed = ["safe"]
+    md = (
+        MarkdownIt("commonmark")
+        .use(attrs_plugin, spans=True, allowed=allowed)
+        .use(attrs_block_plugin, allowed=allowed)
+    )
+    tokens = md.parse("""
+[a]{danger1=c safe=d} b
+    """)
+    data_regression.check([t.as_dict() for t in tokens])
