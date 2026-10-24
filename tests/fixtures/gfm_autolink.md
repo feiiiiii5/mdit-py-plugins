@@ -223,3 +223,12 @@ xmpp:foo@bar.baz/txt/bin
 .
 <p><a href="xmpp:foo@bar.baz/txt">xmpp:foo@bar.baz/txt</a>/bin</p>
 .
+
+GFM autolink: www. inside link text
+.
+see [www.example.com](https://example.com)
+[link *www.example.com*](https://example.org)
+.
+<p>see <a href="https://example.com">www.example.com</a>
+<a href="https://example.org">link <em>www.example.com</em></a></p>
+.

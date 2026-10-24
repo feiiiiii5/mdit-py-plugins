@@ -159,7 +159,11 @@ def _www_inline_rule(state: StateInline, silent: bool) -> bool:
     label = src[pos : pos + length]
 
     if silent:
-        return True
+        # Do not claim the match in validation mode.  The scanner can run past
+        # a closing ``]`` (a URL may legally contain ``](``), so consuming the
+        # match here would hide the end of a link label and hang
+        # ``parseLinkLabel`` when the rule claims success without advancing.
+        return False
 
     full_url = state.md.normalizeLink(url)
     if not state.md.validateLink(full_url):
@@ -223,7 +227,9 @@ def _protocol_rule(state: StateInline, silent: bool) -> bool:
     label = combined[:total_len]
 
     if silent:
-        return True
+        # See the note in ``_www_inline_rule``: validation mode must not claim
+        # a match without advancing the position.
+        return False
     return _create_autolink(state, bscan_len, total_len, full_url, label)
 
 
@@ -291,5 +297,7 @@ def _email_rule(state: StateInline, silent: bool) -> bool:
     url = "mailto:" + email_text
 
     if silent:
-        return True
+        # See the note in ``_www_inline_rule``: validation mode must not claim
+        # a match without advancing the position.
+        return False
     return _create_autolink(state, local_len, total_len, url, email_text)
